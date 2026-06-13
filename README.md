@@ -12,10 +12,12 @@ A RESTful API built with Go, GoFiber, PostgreSQL, and SQLC to manage users with 
 - **Docker** — Containerization
 
 ## Project Structure
+
+```text
 /cmd/server/main.go
 /config/
 /db/migrations/
-/db/sqlc/
+/db/sqlc/<generated>
 /internal/
 ├── handler/
 ├── repository/
@@ -24,6 +26,7 @@ A RESTful API built with Go, GoFiber, PostgreSQL, and SQLC to manage users with 
 ├── middleware/
 ├── models/
 └── logger/
+```
 
 ## Setup and Run
 
