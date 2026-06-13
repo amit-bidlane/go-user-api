@@ -68,10 +68,30 @@ export SERVER_PORT=3000
 ```bash
 go run cmd/server/main.go
 ```
+## Request Rules
+
+### Name field
+
+- Must contain letters and spaces only
+- Minimum 2 characters, maximum 100 characters
+- Numbers and symbols are not allowed
+- ❌ `"5464"` → error: name must contain letters and spaces only
+- ✅ `"Amit Bidlane"` → accepted
+
+### DOB field
+
+- Must be in `YYYY-MM-DD` format
+- Cannot be a future date
+- Month cannot be greater than 12
+- Day cannot be greater than 31
+- April, June, September, November only have 30 days
+- February cannot have more than 28 or 29 days
+- ❌ `"2030-05-10"` → error: date of birth cannot be in the future
+- ❌ `"2003-13-01"` → error: month cannot be greater than 12
+- ❌ `"2003-06-31"` → error: June only has 30 days
+- ✅ `"2003-11-01"` → accepted
 
 ## API Endpoints
-
-> **Note:** All `dob` fields must be in `YYYY-MM-DD` format. Example: `"1990-05-10"`
 
 ### Create User
 
