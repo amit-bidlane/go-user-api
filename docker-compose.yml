@@ -17,6 +17,7 @@ services:
   app:
     build: .
     container_name: go-user-api
+    restart: on-failure
     ports:
       - "3000:3000"
     environment:
