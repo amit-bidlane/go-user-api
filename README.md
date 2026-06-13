@@ -71,6 +71,8 @@ go run cmd/server/main.go
 
 ## API Endpoints
 
+> **Note:** All `dob` fields must be in `YYYY-MM-DD` format. Example: `"1990-05-10"`
+
 ### Create User
 
 ```http
