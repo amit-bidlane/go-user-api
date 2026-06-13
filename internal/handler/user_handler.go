@@ -17,9 +17,19 @@ type UserHandler struct {
 }
 
 func NewUserHandler(service *service.UserService) *UserHandler {
+	v := validator.New()
+	v.RegisterValidation("alpha_space", func(fl validator.FieldLevel) bool {
+		value := fl.Field().String()
+		for _, r := range value {
+			if !((r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || r == ' ') {
+				return false
+			}
+		}
+		return true
+	})
 	return &UserHandler{
 		service:  service,
-		validate: validator.New(),
+		validate: v,
 	}
 }
 
@@ -33,9 +43,18 @@ func (h *UserHandler) CreateUser(c *fiber.Ctx) error {
 	}
 
 	if err := h.validate.Struct(req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": err.Error(),
-		})
+		for _, e := range err.(validator.ValidationErrors) {
+			if e.Field() == "Name" {
+				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+					"error": "name must contain letters and spaces only",
+				})
+			}
+			if e.Field() == "Dob" {
+				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+					"error": "dob is required, use YYYY-MM-DD format",
+				})
+			}
+		}
 	}
 
 	user, err := h.service.CreateUser(c.Context(), req)
@@ -85,9 +104,18 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	}
 
 	if err := h.validate.Struct(req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": err.Error(),
-		})
+		for _, e := range err.(validator.ValidationErrors) {
+			if e.Field() == "Name" {
+				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+					"error": "name must contain letters and spaces only",
+				})
+			}
+			if e.Field() == "Dob" {
+				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+					"error": "dob is required, use YYYY-MM-DD format",
+				})
+			}
+		}
 	}
 
 	user, err := h.service.UpdateUser(c.Context(), int32(id), req)
