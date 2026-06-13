@@ -72,31 +72,46 @@ go run cmd/server/main.go
 ## API Endpoints
 
 ### Create User
-POST /users
 
+```http
+POST /users
 Content-Type: application/json
+
 {
-"name": "Alice",
-"dob": "1990-05-10"
+  "name": "Alice",
+  "dob": "1990-05-10"
 }
+```
 
 ### Get User by ID
+
+```http
 GET /users/:id
+```
 
 ### Update User
+
+```http
 PUT /users/:id
 Content-Type: application/json
 
 {
-"name": "Alice Updated",
-"dob": "1991-03-15"
+  "name": "Alice Updated",
+  "dob": "1991-03-15"
 }
+```
 
 ### Delete User
+
+```http
 DELETE /users/:id
+```
 
 ### List All Users (with pagination)
+
+```http
 GET /users?page=1&limit=10
+```
 
 ## Running Tests
 
