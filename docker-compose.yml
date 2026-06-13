@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: userdb
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: userdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/migrations/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+  app:
+    build: .
+    container_name: go-user-api
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: userdb
+      SERVER_PORT: 3000
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
