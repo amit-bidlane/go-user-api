@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
 	db "go-user-api/db/sqlc"
@@ -19,6 +21,9 @@ func NewUserService(repo *repository.UserRepository) *UserService {
 }
 
 func CalculateAge(dob time.Time) int {
+	if dob.After(time.Now()) {
+    	return 0
+	}	
 	today := time.Now()
 	age := today.Year() - dob.Year()
 	if today.YearDay() < dob.YearDay() {
@@ -27,10 +32,57 @@ func CalculateAge(dob time.Time) int {
 	return age
 }
 
+func validateDOB(dobStr string) error {
+	parts := strings.Split(dobStr, "-")
+	if len(parts) != 3 {
+		return fmt.Errorf("invalid date format, use YYYY-MM-DD")
+	}
+
+	month, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return fmt.Errorf("invalid month value")
+	}
+
+	day, err := strconv.Atoi(parts[2])
+	if err != nil {
+		return fmt.Errorf("invalid day value")
+	}
+
+	if month > 12 {
+		return fmt.Errorf("month cannot be greater than 12")
+	}
+
+	if day > 31 {
+		return fmt.Errorf("day cannot be greater than 31")
+	}
+
+	thirtyDayMonths := map[int]string{
+		4: "April", 6: "June", 9: "September", 11: "November",
+	}
+
+	if name, ok := thirtyDayMonths[month]; ok && day == 31 {
+		return fmt.Errorf("%s only has 30 days", name)
+	}
+
+	if month == 2 && day > 29 {
+		return fmt.Errorf("February cannot have more than 28 or 29 days")
+	}
+
+	return nil
+}
+
 func (s *UserService) CreateUser(ctx context.Context, req models.CreateUserRequest) (models.UserResponse, error) {
+	if err := validateDOB(req.Dob); err != nil {
+		return models.UserResponse{}, err
+	}
+
 	dob, err := time.Parse("2006-01-02", req.Dob)
 	if err != nil {
-		return models.UserResponse{}, fmt.Errorf("invalid date format, use YYYY-MM-DD")
+		return models.UserResponse{}, fmt.Errorf("invalid date: day or month value does not exist")
+	}
+
+	if dob.After(time.Now()) {
+		return models.UserResponse{}, fmt.Errorf("date of birth cannot be in the future")
 	}
 
 	user, err := s.repo.CreateUser(ctx, db.CreateUserParams{
@@ -63,9 +115,17 @@ func (s *UserService) GetUserByID(ctx context.Context, id int32) (models.UserWit
 }
 
 func (s *UserService) UpdateUser(ctx context.Context, id int32, req models.UpdateUserRequest) (models.UserResponse, error) {
+	if err := validateDOB(req.Dob); err != nil {
+		return models.UserResponse{}, err
+	}
+
 	dob, err := time.Parse("2006-01-02", req.Dob)
 	if err != nil {
-		return models.UserResponse{}, fmt.Errorf("invalid date format, use YYYY-MM-DD")
+		return models.UserResponse{}, fmt.Errorf("invalid date: day or month value does not exist")
+	}
+
+	if dob.After(time.Now()) {
+		return models.UserResponse{}, fmt.Errorf("date of birth cannot be in the future")
 	}
 
 	user, err := s.repo.UpdateUser(ctx, db.UpdateUserParams{
