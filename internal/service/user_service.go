@@ -33,6 +33,10 @@ func CalculateAge(dob time.Time) int {
 }
 
 func validateDOB(dobStr string) error {
+	if strings.HasPrefix(dobStr, " ") || strings.HasSuffix(dobStr, " ") {
+		return fmt.Errorf("date of birth cannot have leading or trailing spaces")
+	}
+
 	parts := strings.Split(dobStr, "-")
 	if len(parts) != 3 {
 		return fmt.Errorf("invalid date format, use YYYY-MM-DD")
