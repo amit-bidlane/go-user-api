@@ -75,12 +75,14 @@ go run cmd/server/main.go
 - Must contain letters and spaces only
 - Minimum 2 characters, maximum 100 characters
 - Numbers and symbols are not allowed
+- Leading or trailing spaces are not allowed
 - ❌ `"5464"` → error: name must contain letters and spaces only
 - ✅ `"Amit Bidlane"` → accepted
 
 ### DOB field
 
 - Must be in `YYYY-MM-DD` format
+- Leading or trailing spaces are not allowed
 - Cannot be a future date
 - Month cannot be greater than 12
 - Day cannot be greater than 31
