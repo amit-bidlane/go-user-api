@@ -2,6 +2,7 @@ package handler
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/go-playground/validator/v10"
@@ -20,6 +21,11 @@ func NewUserHandler(service *service.UserService) *UserHandler {
 	v := validator.New()
 	v.RegisterValidation("alpha_space", func(fl validator.FieldLevel) bool {
 		value := fl.Field().String()
+
+		if strings.HasPrefix(value, " ") || strings.HasSuffix(value, " ") {
+			return false
+		}
+
 		for _, r := range value {
 			if !((r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || r == ' ') {
 				return false
